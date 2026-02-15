@@ -10,7 +10,7 @@ services:
       - key: PORT
         value: 8000
       - key: APP_URL
-        fromContext: instance_url
+        sync: false
       - key: MONGO_URI
         sync: false
       - key: JWT_SECRET
