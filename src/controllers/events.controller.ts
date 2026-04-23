@@ -94,7 +94,7 @@ export const getEventById = async (req: Request, res: Response) => {
             return res.status(404).json({ message: "Event not found" });
         }
         const eventWithShareUrl = {
-            ...event.toObject(),
+            ...event,
             shareUrl: `${process.env.APP_URL || 'http://localhost:8000'}/api/events/${event._id}`
         };
         cacheService.set(cacheKey, eventWithShareUrl);
