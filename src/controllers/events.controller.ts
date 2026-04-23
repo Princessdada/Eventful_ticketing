@@ -73,8 +73,8 @@ export const getEventById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         
-        // Validate hex ID format for MongoDB to prevent CastError 500
-        if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+        // Validate ID exists and is a valid hex string for MongoDB
+        if (!id || typeof id !== 'string' || !id.match(/^[0-9a-fA-F]{24}$/)) {
             console.log(`DEBUG: Invalid ID format requested: ${id}`);
             return res.status(404).json({ message: "Event not found (Invalid ID format)" });
         }
