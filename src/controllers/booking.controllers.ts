@@ -62,6 +62,7 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
 // Get all bookings for the logged-in user
 export const getUserBookings = async (req: AuthRequest, res: Response) => {
     try {
+        console.log("DEBUG: Fetching bookings for user ID:", req.user.id);
         const bookings = await Booking.find({ user: req.user.id })
             .populate("event", "title date location price")
             .sort({ createdAt: -1 });

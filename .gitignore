@@ -20,3 +20,9 @@ Thumbs.db
 .cache/
 .env.test
 .env.production
+
+# Assistant related
+scratch/
+.gemini/
+.antigravity/
+.next/

@@ -17,14 +17,17 @@ export const protect = (
   }
 
   try {
-    // DEBUG: Print secret being used
-    const secret = process.env.JWT_SECRET || "your_secret_key";
-    console.log("DEBUG: Verifying with secret:", secret);
+    const secret = process.env.JWT_SECRET;
+    if (!secret) throw new Error("JWT_SECRET is not defined in environment");
+    
     const decoded = jwt.verify(token, secret);
     req.user = decoded;
     next();
-  } catch (error) {
-    console.error("Auth Middleware Error:", error);
+  } catch (error: any) {
+    console.error("Auth Middleware Error:", error.name, error.message);
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: "Token expired" });
+    }
     return res.status(401).json({ message: "Invalid token" });
   }
 };

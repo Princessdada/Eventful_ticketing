@@ -20,23 +20,18 @@ export const getBookingQRCode = async (req: AuthRequest, res: Response) => {
             return res.status(404).json({ message: "Booking not found" });
         }
 
-        // Verify the booking belongs to the user or user is a creator (logic can be expanded)
+        // Verify the booking belongs to the user or user is a creator
         if (booking.user.toString() !== req.user.id) {
-            // Check if user is the creator of the event
             const event = booking.event as any;
             if (event.creator && event.creator.toString() !== req.user.id) {
-                return res.status(403).json({ message: "Not authorized to view this booking's QR code" });
+                return res.status(403).json({ message: "Not authorized to view this booking" });
             }
         }
 
-        // The data to encode in the QR code
-        // For now, we encode the booking reference and a verification link (placeholder)
-        const verificationData = JSON.stringify({
-            bookingId: booking._id,
-            reference: booking.bookingReference,
-            status: booking.status
-        });
+        // The data to encode in the QR code (Verification URL)
+        const verificationData = `http://192.168.2.144:8000/verify/${bookingId}`;
 
+        // Use the service to generate the code
         const qrCodeDataUrl = await qrService.generateQRCode(verificationData);
 
         res.status(200).json({

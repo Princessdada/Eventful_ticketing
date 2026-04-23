@@ -19,7 +19,12 @@ const EventSchema = new Schema({
     },
     price: {
         type: Number,
-        required: true
+        required: [true, "Price is required"],
+        min: [0, "Price cannot be negative"]
+    },
+    image: {
+        type: String,
+        default: ""
     },
     creator: {
         type: Schema.Types.ObjectId,

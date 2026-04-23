@@ -7,28 +7,45 @@ import cacheService from "../services/cache.service.js";
 // Create a new event
 export const createEvent = async (req: AuthRequest, res: Response) => {
     try {
-        const { title, description, date, location, price } = req.body;
+        console.log("DEBUG: Create Event Request:", {
+            bodyKeys: Object.keys(req.body),
+            title: req.body.title,
+            hasImage: !!req.body.image
+        });
+        const { title, description, date, location, price, image } = req.body;
 
-        // Basic validation
-        if (!title || !description || !date || !location || !price) {
-            return res.status(400).json({ message: "All fields are required" });
+        console.log("DEBUG: Validation Check Proceeding...");
+        // Basic validation - check for missing or empty strings
+        if (!title || !description || !date || !location || (price === undefined || price === null || price === "")) {
+            console.log("DEBUG: Validation Failed:", { title, description, date, location, price });
+            return res.status(400).json({ message: "All fields are required. Please ensure price is a valid number." });
         }
 
+        console.log("DEBUG: Creating Event Instance...");
         const event = new Event({
             title,
             description,
             date,
             location,
             price,
+            image,
             creator: req.user.id, // Assumes auth middleware populates req.user
             attendees: []
         });
 
+        console.log("DEBUG: Saving Event to DB...");
         await event.save();
+        console.log("DEBUG: Event saved successfully:", event._id);
         cacheService.del("all_events");
         res.status(201).json(event);
-    } catch (error) {
-        console.error("Create Event Error:", error);
+    } catch (error: any) {
+        console.error("Create Event Error:", error.message);
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ 
+                message: "Validation Error", 
+                errors: Object.values(error.errors).map((e: any) => e.message) 
+            });
+        }
         res.status(500).json({ message: "Server error" });
     }
 };
@@ -54,14 +71,22 @@ export const getEvents = async (req: Request, res: Response) => {
 // Get single event by ID
 export const getEventById = async (req: Request, res: Response) => {
     try {
-        const cacheKey = `event_${req.params.id}`;
+        const { id } = req.params;
+        
+        // Validate hex ID format for MongoDB to prevent CastError 500
+        if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+            console.log(`DEBUG: Invalid ID format requested: ${id}`);
+            return res.status(404).json({ message: "Event not found (Invalid ID format)" });
+        }
+
+        const cacheKey = `event_${id}`;
         const cachedEvent = cacheService.get(cacheKey);
         if (cachedEvent) {
             console.log(`DEBUG: Serving ${cacheKey} from cache`);
             return res.json(cachedEvent);
         }
 
-        const event = await Event.findById(req.params.id).populate("creator", "name email");
+        const event = await Event.findById(id).populate("creator", "name email");
         if (!event) {
             return res.status(404).json({ message: "Event not found" });
         }
@@ -71,9 +96,9 @@ export const getEventById = async (req: Request, res: Response) => {
         };
         cacheService.set(cacheKey, eventWithShareUrl);
         res.json(eventWithShareUrl);
-    } catch (error) {
-        console.error("Get Event Error:", error);
-        res.status(500).json({ message: "Server error" });
+    } catch (error: any) {
+        console.error("Get Event Error:", error.message);
+        res.status(500).json({ message: "Server error", error: error.message });
     }
 };
 
