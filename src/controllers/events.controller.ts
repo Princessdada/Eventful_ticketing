@@ -59,7 +59,7 @@ export const getEvents = async (req: Request, res: Response) => {
             return res.json(cachedEvents);
         }
 
-        const events = await Event.find().populate("creator", "name email");
+        const events = await Event.find().populate("creator", "name email").lean();
         cacheService.set("all_events", events);
         res.json(events);
     } catch (error) {
@@ -86,7 +86,7 @@ export const getEventById = async (req: Request, res: Response) => {
             return res.json(cachedEvent);
         }
 
-        const event = await Event.findById(id).populate("creator", "name email");
+        const event = await Event.findById(id).populate("creator", "name email").lean();
         if (!event) {
             return res.status(404).json({ message: "Event not found" });
         }
