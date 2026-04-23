@@ -53,6 +53,9 @@ export const createEvent = async (req: AuthRequest, res: Response) => {
 // Get all events
 export const getEvents = async (req: Request, res: Response) => {
     try {
+        // Force clear cache for portfolio refresh
+        cacheService.del("all_events");
+
         const cachedEvents = cacheService.get("all_events");
         if (cachedEvents) {
             console.log("DEBUG: Serving all_events from cache");
