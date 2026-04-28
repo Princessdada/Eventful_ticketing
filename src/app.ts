@@ -8,6 +8,7 @@ import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger.js";
 import authRoutes from "./routes/auth.routes.js";
 import { apiLimiter, authLimiter } from "./middlewares/rateLimit.middleware.js";
+import { protect } from "./middlewares/auth.middleware.js";
 import connectDB from "./config/db.js";
 
 // Initialize Database
@@ -54,9 +55,14 @@ app.get("/", (_req: Request, res: Response) => {
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-import { protect } from "./middlewares/auth.middleware.js";
 app.get("/api/test-auth", protect, (_req, res) => {
   res.json({ message: "You are authenticated!" });
+});
+
+// Redirect legacy or direct /verify links to the frontend
+app.get("/verify/:bookingId", (req, res) => {
+  const frontendUrl = process.env.FRONTEND_URL || "https://eventful-ticketing.vercel.app";
+  res.redirect(`${frontendUrl}/verify/${req.params.bookingId}`);
 });
 
 // Global Error Handler
