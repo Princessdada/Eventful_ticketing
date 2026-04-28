@@ -8,6 +8,10 @@ import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger.js";
 import authRoutes from "./routes/auth.routes.js";
 import { apiLimiter, authLimiter } from "./middlewares/rateLimit.middleware.js";
+import connectDB from "./config/db.js";
+
+// Initialize Database
+connectDB();
 
 const app = express();
 
