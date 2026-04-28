@@ -122,8 +122,8 @@ export default function EventDetailsPage() {
   const dateStr = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
   const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
-  // Local URL for testing scanner 'Open Link' behavior
-  const qrData = `http://localhost:8000/verify/${ticketId}?event=${encodeURIComponent(event.title)}&date=${encodeURIComponent(event.date)}`;
+  // Dynamic URL for scanner behavior
+  const qrData = `${typeof window !== 'undefined' ? window.location.origin : ''}/verify/${ticketId}?event=${encodeURIComponent(event.title)}&date=${encodeURIComponent(event.date)}`;
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#0f172a' }}>
