@@ -4,10 +4,10 @@
   "description": "",
   "main": "dist/server.js",
   "scripts": {
-    "start": "node dist/server.js",
-    "build": "tsc",
+    "start": "node api.js && node dist/server.js",
+    "build": "node api.js && tsc",
     "postinstall": "npm run build",
-    "dev": "nodemon --watch src --exec \"tsx src/server.ts\"",
+    "dev": "node api.js && nodemon --watch src --exec \"tsx src/server.ts\"",
     "test": "vitest run",
     "test:watch": "vitest"
   },
