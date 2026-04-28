@@ -29,7 +29,8 @@ export const getBookingQRCode = async (req: AuthRequest, res: Response) => {
         }
 
         // The data to encode in the QR code (Verification URL)
-        const verificationData = `http://192.168.2.144:8000/verify/${bookingId}`;
+        const frontendUrl = process.env.FRONTEND_URL || "https://eventful-ticketing.vercel.app";
+        const verificationData = `${frontendUrl}/verify/${bookingId}`;
 
         // Use the service to generate the code
         const qrCodeDataUrl = await qrService.generateQRCode(verificationData);
